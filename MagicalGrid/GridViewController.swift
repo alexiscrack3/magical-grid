@@ -4,6 +4,7 @@ import UIKit
 class GridViewController: UIViewController {
     private let numberViewPerRow = 15
     private var cells = [String: UIView]()
+    private var selectedCell: UIView?
     
     // MARK: - Initialization
     required init?(coder aDecoder: NSCoder) {
@@ -71,7 +72,24 @@ class GridViewController: UIViewController {
         print(x, y)
         
         let key = self.cellKey(x, y)
-        let cellView = cells[key]
-        cellView?.backgroundColor = .white
+        guard let cellView = cells[key] else { return }
+        if selectedCell != cellView {
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                self.selectedCell?.layer.transform = CATransform3DIdentity
+            }, completion: nil)
+        }
+        selectedCell = cellView
+        
+        self.view.bringSubview(toFront: cellView)
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+            cellView.layer.transform = CATransform3DMakeScale(3, 3, 3)
+        }, completion: nil)
+        
+        if sender.state == .ended {
+            UIView.animate(withDuration: 0.5, delay: 0.25, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+                self.selectedCell?.layer.transform = CATransform3DIdentity
+            }, completion: nil)
+        }
     }
 }
